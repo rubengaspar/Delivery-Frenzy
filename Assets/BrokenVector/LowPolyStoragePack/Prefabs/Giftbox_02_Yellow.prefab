@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 2368764}
   - component: {fileID: 6493588}
   - component: {fileID: 935957647808830278}
+  - component: {fileID: -646497305375778515}
   m_Layer: 0
   m_Name: Giftbox_02_Yellow
   m_TagString: Grabbable
@@ -115,3 +116,21 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &-646497305375778515
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 177488}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eefc88369f0c89f4ea15647437cf2d77, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  color: {r: 0.5176471, g: 0.5254902, b: 0.38823533, a: 0}
+  points: 100
+  fallSpeedMultiplier: 5
+  gravity: -9.8
+  waterDamage: 0
+  fireDamage: 0

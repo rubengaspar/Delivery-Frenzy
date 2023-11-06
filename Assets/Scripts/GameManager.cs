@@ -22,6 +22,10 @@ public class GameManager : MonoBehaviour
         timeManager.Initialize(this);
         weatherManager.Initialize(this);
         boxSpawner.Initialize(this);
+
+        // Hide the mouse cursor
+        Cursor.visible = false;
+
     }
 
     void Update()

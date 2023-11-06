@@ -2,34 +2,31 @@ using UnityEngine;
 
 public static class Distribution
 {
-    public static int GeneratePoisson(float lambda)
+
+    // Generate a random number from a normal distribution
+    #region Normal Distribution
+    public static float Normal(float mean, float minValue, float maxValue)
     {
-        float L = Mathf.Exp(-lambda);
-        float p = 1.0f;
-        int k = 0;
+        float stdDev = (maxValue - minValue) / 6;
 
-        do
-        {
-            k++;
-            p *= UnityEngine.Random.value;
-        }
-        while (p > L);
+        float rand1 = Random.Range(0f, 1f);
+        float rand2 = Random.Range(0f, 1f);
 
-        return k - 1;
+        float RandomNormal_BoxMuller = Mathf.Sqrt(-2.0f * Mathf.Log(rand1)) * Mathf.Cos(2.0f * Mathf.PI * rand2);
+        float value = mean + stdDev * RandomNormal_BoxMuller;
+
+        return Mathf.Clamp(value, minValue, maxValue);
     }
+    #endregion
 
-    public static float PoissonProbability(float lambda, int k)
+    // Generate a random number from an exponential distribution
+    #region Exponential Distribution
+    public static float Exponential(float rate)
     {
-        return Mathf.Exp(-lambda) * Mathf.Pow(lambda, k) / Factorial(k);
+        float uniform = Random.Range(0f, 1f);
+        return -Mathf.Log(uniform) / rate;
     }
+    #endregion
 
-    private static int Factorial(int n)
-    {
-        int result = 1;
-        for (int i = 1; i <= n; i++)
-        {
-            result *= i;
-        }
-        return result;
-    }
+
 }
