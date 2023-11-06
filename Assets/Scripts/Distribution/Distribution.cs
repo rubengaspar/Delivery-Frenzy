@@ -28,5 +28,7 @@ public static class Distribution
     }
     #endregion
 
+    // #region Poisson Distribution
+
 
 }
