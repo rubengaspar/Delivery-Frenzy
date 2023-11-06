@@ -1,11 +1,20 @@
 using System.Drawing;
 using System.IO;
+using UnityEditor;
 using UnityEngine;
+
 
 public class BoxSpawner : MonoBehaviour
 {
     [Header("Prefab")]
     [SerializeField] private GameObject[] boxPrefabs;
+    [SerializeField] private GameObject[] presentPrefabs;
+    [SerializeField] private GameObject bombBoxPrefab;
+
+    [Header("Box Type Probability")]
+    [SerializeField, Range(0, 1)] private float boxProbability;
+    [SerializeField, Range(0, 1)] private float presentProbability;
+    [SerializeField, Range(0, 1)] private float bombProbability;
 
     [Header("Spawn Settings")]
     [SerializeField] private GameObject spawnCenter;
@@ -49,7 +58,7 @@ public class BoxSpawner : MonoBehaviour
     void SpawnBox()
     {
         // Random selected box
-        GameObject selectedPrefab = boxPrefabs[Random.Range(0, boxPrefabs.Length)];
+        GameObject selectedPrefab = GetRandomBoxType();
 
         // Random spawn location
         Vector3 spawnLocation = spawnCenter.transform.position + GetRandomLocation();
@@ -139,6 +148,25 @@ public class BoxSpawner : MonoBehaviour
         {
             return BoxObject.DeliveryType.SameDay;
         }
+
+    }
+
+    private GameObject GetRandomBoxType()
+    {
+        float value = Random.Range(0, 100);
+
+        // Interval = [ 0, box probability]
+        if (value < boxProbability) 
+        {
+            return boxPrefabs[Random.Range(0, boxPrefabs.Length)];
+        }
+        // Interval = ] box probability, present probability ]
+        else if (value < (boxProbability + presentProbability)) 
+        {
+            return presentPrefabs[Random.Range(0, presentPrefabs.Length)];
+        }
+        // Interval = ] present robability, 100 ]
+        return bombBoxPrefab; 
 
     }
 
