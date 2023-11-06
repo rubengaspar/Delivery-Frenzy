@@ -37,6 +37,24 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": true
                 },
                 {
+                    ""name"": ""Look"",
+                    ""type"": ""Value"",
+                    ""id"": ""15494614-14a0-4290-b477-d4864a35b810"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""RightMouseClick"",
+                    ""type"": ""Button"",
+                    ""id"": ""2e4a9eba-f0d4-453e-a1ea-d65ef8b0070f"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
                     ""name"": ""Use"",
                     ""type"": ""Button"",
                     ""id"": ""0c5d8686-a7e7-4deb-92bb-88bb50b013eb"",
@@ -55,88 +73,33 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Zoom In"",
-                    ""type"": ""Value"",
-                    ""id"": ""d37c79ce-4145-4870-83f5-090b84b3ebb2"",
-                    ""expectedControlType"": ""Axis"",
+                    ""name"": ""Dash"",
+                    ""type"": ""Button"",
+                    ""id"": ""0456d85b-a38b-4a1e-9644-86aed490fa0e"",
+                    ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
-                    ""initialStateCheck"": true
+                    ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Zoom Out"",
-                    ""type"": ""Value"",
-                    ""id"": ""83964de8-577d-42a5-9731-05758fa59c50"",
-                    ""expectedControlType"": ""Axis"",
+                    ""name"": ""Pause"",
+                    ""type"": ""Button"",
+                    ""id"": ""d22a0792-0a16-4589-8a3c-3fbb9603c3d6"",
+                    ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
-                    ""initialStateCheck"": true
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
                 {
                     ""name"": """",
-                    ""id"": ""7f9deddd-8baa-4af0-a81c-fd1a91ee939c"",
-                    ""path"": ""<Gamepad>/buttonEast"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Controller"",
-                    ""action"": ""Throw"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
                     ""id"": ""81fea8d9-47ee-4b05-870f-1b20d6adf382"",
-                    ""path"": ""<Keyboard>/space"",
+                    ""path"": ""<Mouse>/leftButton"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
                     ""action"": ""Throw"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""c8cc6baa-9dd0-4d0b-bdbe-45073d1bce3e"",
-                    ""path"": ""<Mouse>/scroll/up"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""Zoom In"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""9887a4dc-7e90-4d42-aa6a-cb6959ec1a50"",
-                    ""path"": ""<Gamepad>/rightTrigger"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Controller"",
-                    ""action"": ""Zoom In"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""b09ce28b-c619-4b09-b578-1a05726c6217"",
-                    ""path"": ""<Mouse>/scroll/down"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""Zoom Out"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""2e45eb72-594a-45a9-85f4-de361ba31b61"",
-                    ""path"": ""<Gamepad>/leftTrigger"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Controller"",
-                    ""action"": ""Zoom Out"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -227,6 +190,94 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""action"": ""Use"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""443b0b98-7063-4bd1-af08-7f2c0401b68a"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""Dash"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""0c456f40-3e40-4891-b99c-e069cc56ce30"",
+                    ""path"": ""<Gamepad>/leftShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Controller"",
+                    ""action"": ""Dash"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""ef0c5a6c-67e3-4b33-9127-c94f71971bc4"",
+                    ""path"": ""<Pointer>/delta"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""Look"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""79fd30eb-f159-4f17-a6aa-6395bcc643ee"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""RightMouseClick"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""ab450ebd-ecc3-4850-8c3c-fa2f68921565"",
+                    ""path"": ""<Gamepad>/rightStick"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Look"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""7f9deddd-8baa-4af0-a81c-fd1a91ee939c"",
+                    ""path"": ""<Gamepad>/buttonEast"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Controller"",
+                    ""action"": ""Throw"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e7902b52-fde4-4e72-b99d-70c687e7dfdc"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""Pause"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""3eb0ab3b-5ebe-489f-b134-8ee3c93479c4"",
+                    ""path"": ""<Gamepad>/start"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Controller"",
+                    ""action"": ""Pause"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -292,10 +343,12 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         // Normal Mode
         m_NormalMode = asset.FindActionMap("Normal Mode", throwIfNotFound: true);
         m_NormalMode_Movement = m_NormalMode.FindAction("Movement", throwIfNotFound: true);
+        m_NormalMode_Look = m_NormalMode.FindAction("Look", throwIfNotFound: true);
+        m_NormalMode_RightMouseClick = m_NormalMode.FindAction("RightMouseClick", throwIfNotFound: true);
         m_NormalMode_Use = m_NormalMode.FindAction("Use", throwIfNotFound: true);
         m_NormalMode_Throw = m_NormalMode.FindAction("Throw", throwIfNotFound: true);
-        m_NormalMode_ZoomIn = m_NormalMode.FindAction("Zoom In", throwIfNotFound: true);
-        m_NormalMode_ZoomOut = m_NormalMode.FindAction("Zoom Out", throwIfNotFound: true);
+        m_NormalMode_Dash = m_NormalMode.FindAction("Dash", throwIfNotFound: true);
+        m_NormalMode_Pause = m_NormalMode.FindAction("Pause", throwIfNotFound: true);
         // Precision Mode
         m_PrecisionMode = asset.FindActionMap("Precision Mode", throwIfNotFound: true);
         m_PrecisionMode_Newaction = m_PrecisionMode.FindAction("New action", throwIfNotFound: true);
@@ -361,19 +414,23 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     private readonly InputActionMap m_NormalMode;
     private List<INormalModeActions> m_NormalModeActionsCallbackInterfaces = new List<INormalModeActions>();
     private readonly InputAction m_NormalMode_Movement;
+    private readonly InputAction m_NormalMode_Look;
+    private readonly InputAction m_NormalMode_RightMouseClick;
     private readonly InputAction m_NormalMode_Use;
     private readonly InputAction m_NormalMode_Throw;
-    private readonly InputAction m_NormalMode_ZoomIn;
-    private readonly InputAction m_NormalMode_ZoomOut;
+    private readonly InputAction m_NormalMode_Dash;
+    private readonly InputAction m_NormalMode_Pause;
     public struct NormalModeActions
     {
         private @PlayerInputActions m_Wrapper;
         public NormalModeActions(@PlayerInputActions wrapper) { m_Wrapper = wrapper; }
         public InputAction @Movement => m_Wrapper.m_NormalMode_Movement;
+        public InputAction @Look => m_Wrapper.m_NormalMode_Look;
+        public InputAction @RightMouseClick => m_Wrapper.m_NormalMode_RightMouseClick;
         public InputAction @Use => m_Wrapper.m_NormalMode_Use;
         public InputAction @Throw => m_Wrapper.m_NormalMode_Throw;
-        public InputAction @ZoomIn => m_Wrapper.m_NormalMode_ZoomIn;
-        public InputAction @ZoomOut => m_Wrapper.m_NormalMode_ZoomOut;
+        public InputAction @Dash => m_Wrapper.m_NormalMode_Dash;
+        public InputAction @Pause => m_Wrapper.m_NormalMode_Pause;
         public InputActionMap Get() { return m_Wrapper.m_NormalMode; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -386,18 +443,24 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @Movement.started += instance.OnMovement;
             @Movement.performed += instance.OnMovement;
             @Movement.canceled += instance.OnMovement;
+            @Look.started += instance.OnLook;
+            @Look.performed += instance.OnLook;
+            @Look.canceled += instance.OnLook;
+            @RightMouseClick.started += instance.OnRightMouseClick;
+            @RightMouseClick.performed += instance.OnRightMouseClick;
+            @RightMouseClick.canceled += instance.OnRightMouseClick;
             @Use.started += instance.OnUse;
             @Use.performed += instance.OnUse;
             @Use.canceled += instance.OnUse;
             @Throw.started += instance.OnThrow;
             @Throw.performed += instance.OnThrow;
             @Throw.canceled += instance.OnThrow;
-            @ZoomIn.started += instance.OnZoomIn;
-            @ZoomIn.performed += instance.OnZoomIn;
-            @ZoomIn.canceled += instance.OnZoomIn;
-            @ZoomOut.started += instance.OnZoomOut;
-            @ZoomOut.performed += instance.OnZoomOut;
-            @ZoomOut.canceled += instance.OnZoomOut;
+            @Dash.started += instance.OnDash;
+            @Dash.performed += instance.OnDash;
+            @Dash.canceled += instance.OnDash;
+            @Pause.started += instance.OnPause;
+            @Pause.performed += instance.OnPause;
+            @Pause.canceled += instance.OnPause;
         }
 
         private void UnregisterCallbacks(INormalModeActions instance)
@@ -405,18 +468,24 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @Movement.started -= instance.OnMovement;
             @Movement.performed -= instance.OnMovement;
             @Movement.canceled -= instance.OnMovement;
+            @Look.started -= instance.OnLook;
+            @Look.performed -= instance.OnLook;
+            @Look.canceled -= instance.OnLook;
+            @RightMouseClick.started -= instance.OnRightMouseClick;
+            @RightMouseClick.performed -= instance.OnRightMouseClick;
+            @RightMouseClick.canceled -= instance.OnRightMouseClick;
             @Use.started -= instance.OnUse;
             @Use.performed -= instance.OnUse;
             @Use.canceled -= instance.OnUse;
             @Throw.started -= instance.OnThrow;
             @Throw.performed -= instance.OnThrow;
             @Throw.canceled -= instance.OnThrow;
-            @ZoomIn.started -= instance.OnZoomIn;
-            @ZoomIn.performed -= instance.OnZoomIn;
-            @ZoomIn.canceled -= instance.OnZoomIn;
-            @ZoomOut.started -= instance.OnZoomOut;
-            @ZoomOut.performed -= instance.OnZoomOut;
-            @ZoomOut.canceled -= instance.OnZoomOut;
+            @Dash.started -= instance.OnDash;
+            @Dash.performed -= instance.OnDash;
+            @Dash.canceled -= instance.OnDash;
+            @Pause.started -= instance.OnPause;
+            @Pause.performed -= instance.OnPause;
+            @Pause.canceled -= instance.OnPause;
         }
 
         public void RemoveCallbacks(INormalModeActions instance)
@@ -501,10 +570,12 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     public interface INormalModeActions
     {
         void OnMovement(InputAction.CallbackContext context);
+        void OnLook(InputAction.CallbackContext context);
+        void OnRightMouseClick(InputAction.CallbackContext context);
         void OnUse(InputAction.CallbackContext context);
         void OnThrow(InputAction.CallbackContext context);
-        void OnZoomIn(InputAction.CallbackContext context);
-        void OnZoomOut(InputAction.CallbackContext context);
+        void OnDash(InputAction.CallbackContext context);
+        void OnPause(InputAction.CallbackContext context);
     }
     public interface IPrecisionModeActions
     {

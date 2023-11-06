@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 2387832}
   - component: {fileID: 6408322}
   - component: {fileID: -1101159848756326963}
+  - component: {fileID: -4937635321836723550}
   m_Layer: 0
   m_Name: Giftbox_03_Purple
   m_TagString: Grabbable
@@ -115,3 +116,21 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &-4937635321836723550
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 126694}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eefc88369f0c89f4ea15647437cf2d77, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  color: {r: 0.3921569, g: 0.3647059, b: 0.54901963, a: 0}
+  points: 100
+  fallSpeedMultiplier: 5
+  gravity: -9.8
+  waterDamage: 0
+  fireDamage: 0

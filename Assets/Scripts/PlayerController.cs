@@ -1,60 +1,100 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
-    [Header("UI Settings")]
-    [SerializeField] private TMP_Text throwText;
-    [SerializeField] private TMP_Text boxInfo;
+    // Monitoring Variables
+    #region Monitoring Variables
+    [Header("Monitoring")]
+    [SerializeField] private Coroutine currentDashCoroutine;
 
-    [Header("Settings")]
+    #endregion
+
+    // Movement Settings
+    #region Movement Settings
+    [Header("Movement")]
     [SerializeField] public float maxSpeed = 15f;
-    [SerializeField] public float moveSpeed = 20f;
+    [SerializeField] public float moveSpeed = 50f;
+    [SerializeField] private Vector3 movementInput;
+    [SerializeField] private Vector2 _movement;
+    [SerializeField] private Vector3 movement;
+    [SerializeField] private Transform cameraTransform;
 
+    private PlayerInput playerInput;
+    private Rigidbody rb;
+    #endregion
+
+    // Throw Settings
+    #region Throw Settings
+    [Header("Throw Settings")]
+    [SerializeField] public float throwAngle = 45f;
     [SerializeField] public float minThrowForce = 2f;
     [SerializeField] public float maxThrowForce = 50f;
     [SerializeField] public float rotationSpeed = 5f;
-    [SerializeField] public float maxThrowChargeTime = 3f;
-
-    [SerializeField] public float interactionDistance = 3f;
-    
-    [Header("Movement")]
-    [SerializeField] private Vector2 _movement;
-    [SerializeField] private Vector3 movement;
-
-    [Header("Containers")]
-    [SerializeField]private GameObject BoxHolder;
-
-    private GameObject lastTarget;
-    private bool isHoldingBox = false;
-    private GameObject heldBox;
-
-    PlayerInputActions playerInputActions;
-    private PlayerInput playerInput;
-    private Rigidbody rb;
+    [SerializeField] public float maxThrowChargeTime = 1.5f;
 
     // Throw variables
     private float throwStartTime;
     private float currentThrowStrength;
     private float throwForce;
+    #endregion
 
+    // Interaction Settings
+    #region Interaction Settings
+    [Header("Interaction Settings")]
+    [SerializeField] public float interactionDistance = 3f;
+
+    private GameObject lastTarget;
+    private bool isHoldingBox = false;
+    private GameObject heldBox;
+    #endregion
+
+    // Dash Settings
+    #region Dash Settings
+    [Header("Dash Settings")]
+    [SerializeField] private float dashSpeed = 50f;
+    [SerializeField] private float dashDuration = 0.5f;
+    [SerializeField] private float dashCooldown = 1f;
+    [SerializeField] private bool isDashing = false;
+    private float lastDashTime;
+    #endregion
+
+    // Other Serialized Settings and Object References
+    #region Other Serialized Settings and Object References
+    [Header("Holders")]
+    [SerializeField] private GameObject BoxHolder;
+
+    [Header("UI Settings")]
+    [SerializeField] private TMP_Text throwText;
+    [SerializeField] private TMP_Text boxInfo;
+
+    [Header("Player Model")]
+    [SerializeField] private GameObject player;
+    #endregion 
+
+    // Input System Subscribe/Unsubscribe
+    #region Input System subcribe/unsubscribe
     private void Awake()
     {
         playerInput = GetComponent<PlayerInput>();
         rb = GetComponent<Rigidbody>();
-        playerInputActions = new PlayerInputActions();
 
-        // Subscribe to actions
-        playerInputActions.NormalMode.Enable();
-        playerInputActions.NormalMode.Use.performed += UseAction;
-        playerInputActions.NormalMode.Throw.started += StartThrow;
-        playerInputActions.NormalMode.Throw.canceled += ThrowAction;
+        // Enable Action MAp
+        InputManager.Instance.inputActions.NormalMode.Enable();
+
+        // Subscribe to Use
+        InputManager.Instance.inputActions.NormalMode.Use.performed += UseAction;
+        
+        // Subscribe to Throw
+        InputManager.Instance.inputActions.NormalMode.Throw.started += StartThrow;
+        InputManager.Instance.inputActions.NormalMode.Throw.canceled += ThrowAction;
+
+        // Subscribe to Dash
+        InputManager.Instance.inputActions.NormalMode.Dash.performed += Dash;
+
 
         // Start throw text hidden
         throwText.enabled = false;
@@ -62,11 +102,24 @@ public class PlayerController : MonoBehaviour
 
     }
 
-    void Start()
+    // Unsubscribe OnDestroy 
+    private void OnDestroy()
     {
-        BoxHolder = GameObject.Find("BoxHolder");
+        // Unsubscribe from Use
+        InputManager.Instance.inputActions.NormalMode.Use.performed -= UseAction;
+        
+        // Unsubscribe from Throw
+        InputManager.Instance.inputActions.NormalMode.Throw.started -= StartThrow;
+        InputManager.Instance.inputActions.NormalMode.Throw.canceled -= ThrowAction;
+
+        // Unsubscribe from Dash
+        InputManager.Instance.inputActions.NormalMode.Dash.performed -= Dash;
     }
 
+    #endregion
+
+    //Unity Event Lifecycle Methods
+    #region Unity Event Lifecycle Methods
     void Update()
     {
         TargetHandler();
@@ -75,44 +128,85 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        // get input from input action and convert to vector3
-        _movement = playerInputActions.NormalMode.Movement.ReadValue<Vector2>();
-        movement = new Vector3(_movement.x, 0, _movement.y);
+        MovePlayer();
+    }
 
-        // apply character rotation
-        if (movement != Vector3.zero) // so that we only apply rotation when keys are pressed
+    #endregion
+
+    // Movement Controller
+    #region Movement Controller
+
+    private void MovePlayer()
+    {
+
+        if (isDashing)
         {
-            Quaternion rotation = Quaternion.LookRotation(movement);
-            transform.rotation = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime * rotationSpeed);
+            return;
         }
 
-        // Add force to move
-        rb.AddForce(movement * moveSpeed, ForceMode.Force);
+        if (!isDashing && currentDashCoroutine != null)
+        {
+            StopCoroutine(currentDashCoroutine);
+        }
 
-        // Limit the maximum speed the player can travel at
+        // get input from input action and convert to vector3
+        _movement = InputManager.Instance.GetMovementInput();
+        movementInput = new Vector3(_movement.x, 0, _movement.y);
+
+        // Creating vector based on forward and right identity
+        Vector3 cameraForward = cameraTransform.forward;
+        cameraForward.y = 0; 
+        cameraForward.Normalize();
+        Vector3 cameraRight = cameraTransform.right;
+        cameraRight.y = 0;
+        cameraRight.Normalize();
+        movement = cameraForward * movementInput.z + cameraRight * movementInput.x;
+
+        // Set velocity directly instead of adding force (no acceleration or deceleration)
+        rb.velocity = new Vector3(movement.x * moveSpeed, rb.velocity.y, movement.z * moveSpeed);
+
+        
         if (rb.velocity.magnitude > maxSpeed)
         {
             rb.velocity = rb.velocity.normalized * maxSpeed;
         }
 
+        // Set character rotation and move only while pressed 
+        if (movement != Vector3.zero)
+        {
+            Quaternion rotation = Quaternion.LookRotation(movement);
+            transform.rotation = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime * rotationSpeed);
+        }
+
     }
 
 
-    private bool IsGrounded()
+    public bool IsGrounded()
     {
         float extraHeight = 0.2f;
         bool grounded = Physics.Raycast(transform.position, Vector3.down, GetComponent<Collider>().bounds.extents.y + extraHeight);
         return grounded;
     }
+    #endregion
 
-
+    // User Controller - Grab, Drop, Use
+    #region Use Controller
     private void TargetHandler()
     {
         if (!isHoldingBox)
-        {        
-            Ray ray = new Ray(transform.position, transform.forward);
+        {
+            // Define the center, halfExtents, and orientation of the box
+            Vector3 center = player.transform.position;
+            Vector3 halfExtents = new Vector3(0.5f, 0.5f, 0.5f);
+            Quaternion orientation = player.transform.rotation;
+
+            // Define the direction and distance
+            Vector3 direction = transform.forward;
+            float maxDistance = interactionDistance;
+
+            // Perform the boxcast
             RaycastHit hit;
-            bool hasTarget = Physics.Raycast(ray, out hit, interactionDistance);
+            bool hasTarget = Physics.BoxCast(center, halfExtents, direction, out hit, orientation, maxDistance);
 
             if (hasTarget)
             {
@@ -129,7 +223,6 @@ public class PlayerController : MonoBehaviour
                     UnhighlightLastTarget();
                 }
             }
-
         }
     }
 
@@ -153,7 +246,7 @@ public class PlayerController : MonoBehaviour
 
     void HighlightObject(GameObject box)
     {
-        box.GetComponent<Renderer>().material.color = Color.green;
+        box.GetComponent<Renderer>().material.color = box.GetComponent<BoxObject>().color;
     }
 
     void UnhighlightLastTarget()
@@ -164,8 +257,6 @@ public class PlayerController : MonoBehaviour
             lastTarget = null;
         }
     }
-
-
 
     void UseAction(InputAction.CallbackContext context)
     {
@@ -207,13 +298,23 @@ public class PlayerController : MonoBehaviour
         UnhighlightLastTarget();
         heldBox = null;
     }
+    #endregion
 
-
+    // Throw Controller - Throw
+    #region Throw Controller
     void StartThrow(InputAction.CallbackContext context)
     {
-        throwText.enabled = true;
-        throwStartTime = Time.time;
-        StartCoroutine(ThrowTimer());
+        if (isHoldingBox)
+        {        
+            throwText.enabled = true;
+            throwStartTime = Time.time;
+            StartCoroutine(ThrowTimer());
+        }
+        else
+        {
+            Debug.Log("Can't throw, Not holding a box");
+        }
+
     }
 
     IEnumerator ThrowTimer()
@@ -271,44 +372,91 @@ public class PlayerController : MonoBehaviour
     {
         if (isHoldingBox)
         {
+            // Time elapsed to calcualte throw strength
             float elapsedTime = Time.time - throwStartTime;
-            elapsedTime = Mathf.Clamp(elapsedTime, 0, 5);
+            elapsedTime = Mathf.Clamp(elapsedTime, 0, maxThrowChargeTime);
+
+            // Calculation of throw strength
             currentThrowStrength = Mathf.Lerp(minThrowForce, maxThrowForce, elapsedTime / maxThrowChargeTime);
 
-            // Temporarily store the heldBox reference
             GameObject tempHeldBox = heldBox;
 
-            // Clear box state
-            isHoldingBox = false;
-            heldBox.transform.SetParent(BoxHolder.transform);
-            heldBox.GetComponent<Rigidbody>().isKinematic = false;
-            lastTarget = heldBox;
-            UnhighlightLastTarget();
+            Vector3 throwDirection = GetThrowVector();
+            Rigidbody boxRb = tempHeldBox.GetComponent<Rigidbody>();
+
+            boxRb.isKinematic = false;
+            if (BoxHolder != null)
+            {
+                tempHeldBox.transform.SetParent(BoxHolder.transform);
+            }
+
+            boxRb.AddForce(throwDirection * currentThrowStrength, ForceMode.VelocityChange);
+
             heldBox = null;
+            isHoldingBox = false;
+            throwText.enabled = false;
 
-            // Direction vector (45º angle to the front)
-            Vector3 forward = transform.forward;
-            Vector3 up = Vector3.up;
-            Vector3 throwDirection = (forward + up).normalized;
+            if (IsInvoking("ThrowTimer"))
+            {
+                StopCoroutine(ThrowTimer());
+            }
 
-            // Apply force to the box
-            tempHeldBox.GetComponent<Rigidbody>().AddForce(throwDirection * throwForce, ForceMode.Impulse);
+            if (IsInvoking("PulseText"))
+            {
+                StopCoroutine(PulseText());
+            }
 
-            // Random rotation vector
-            Vector3 randomImpulse = new Vector3(
-                UnityEngine.Random.Range(-5, 5),
-                UnityEngine.Random.Range(-5, 5),
-                UnityEngine.Random.Range(-5, 5));
-
-            // Apply rotation vector
-            tempHeldBox.GetComponent<Rigidbody>().AddForce(throwDirection * currentThrowStrength, ForceMode.Impulse);
-
-            StopCoroutine(ThrowTimer());
-            StopCoroutine(PulseText());
             throwText.color = Color.white;
             throwText.enabled = false;
-        
+        }
+    }
+
+
+    private Vector3 GetThrowVector()
+        {
+            return (transform.forward + transform.up * Mathf.Tan(Mathf.Deg2Rad * throwAngle)).normalized;
+        }
+    #endregion
+
+    // Dash Controller - Dash
+    #region Dash Controller
+    private void Dash(InputAction.CallbackContext context)
+    {
+        if (Time.time >= lastDashTime + dashCooldown && !isDashing)
+        {
+            if (currentDashCoroutine != null)
+            {
+                StopCoroutine(currentDashCoroutine);
+            }
+            currentDashCoroutine = StartCoroutine(DashCoroutine());
+        }
+        else
+        {
+            lastDashTime = Time.time; // punish players when trying to dash while on cooldown
+        }
+    }
+
+    private IEnumerator DashCoroutine()
+    {
+        // Lock double dash possibility
+        isDashing = true;
+
+        // Get direction and intensity vector and store last velocity vector
+        Vector3 dash = transform.forward * dashSpeed;
+        Vector3 originalVelocity = rb.velocity;
+
+
+        float startTime = Time.time;
+
+        while (Time.time < startTime + dashDuration) // Loop for dash duration
+        {
+            rb.velocity = new Vector3(dash.x, rb.velocity.y, dash.z);
+            yield return null;
         }
 
+        isDashing = false;
+        lastDashTime = Time.time;
     }
+    #endregion
+
 }
