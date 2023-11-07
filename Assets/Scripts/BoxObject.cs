@@ -5,7 +5,6 @@ using UnityEngine;
 
 public class BoxObject : MonoBehaviour
 {
-
     public enum DeliveryStatus
     {
         NotDelivered,
@@ -14,7 +13,7 @@ public class BoxObject : MonoBehaviour
         Lost,
         Stolen
     }
-
+    
     public enum DeliveryType
     {
         Standard,
@@ -39,9 +38,7 @@ public class BoxObject : MonoBehaviour
     [SerializeField] public DeliveryType deliveryType; 
     [SerializeField, Range(0, 1)] private float waterDamage = 0;
     [SerializeField, Range(0, 1)] private float fireDamage = 0;
-
     
-
     void Start()
     {
         // Record the spawn time
@@ -123,7 +120,4 @@ public class BoxObject : MonoBehaviour
     {
         deliveryStatus = DeliveryStatus.Lost;
     }
-
-
-
 }
