@@ -10,7 +10,6 @@ public class PlayerController : MonoBehaviour
     #region Monitoring Variables
     [Header("Monitoring")]
     [SerializeField] private Coroutine currentDashCoroutine;
-
     #endregion
 
     // Movement Settings

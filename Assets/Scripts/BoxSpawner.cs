@@ -99,7 +99,7 @@ public class BoxSpawner : MonoBehaviour
     public Vector3 GetRandomRotation()
     {
         // Random rotation vector
-        return new Vector3(UnityEngine.Random.Range(-minRotation, maxRotation), UnityEngine.Random.Range(-minRotation, maxRotation), UnityEngine.Random.Range(-minRotation, maxRotation));
+        return new Vector3(Random.Range(-minRotation, maxRotation), Random.Range(-minRotation, maxRotation), Random.Range(-minRotation, maxRotation));
     }
 
     // Random scale (W, H, L)
@@ -148,7 +148,6 @@ public class BoxSpawner : MonoBehaviour
         {
             return BoxObject.DeliveryType.SameDay;
         }
-
     }
 
     private GameObject GetRandomBoxType()
@@ -167,7 +166,5 @@ public class BoxSpawner : MonoBehaviour
         }
         // Interval = ] present robability, 100 ]
         return bombBoxPrefab; 
-
     }
-
 }
