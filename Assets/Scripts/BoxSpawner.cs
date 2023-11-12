@@ -1,8 +1,9 @@
+using System;
 using System.Drawing;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
-
+using Random = UnityEngine.Random;
 
 public class BoxSpawner : MonoBehaviour
 {
@@ -12,9 +13,9 @@ public class BoxSpawner : MonoBehaviour
     [SerializeField] private GameObject bombBoxPrefab;
 
     [Header("Box Type Probability")]
-    [SerializeField, Range(0, 1)] private float boxProbability;
-    [SerializeField, Range(0, 1)] private float presentProbability;
-    [SerializeField, Range(0, 1)] private float bombProbability;
+    [SerializeField, Range(0, 1)] private float boxProbability = 0.85f;
+    [SerializeField, Range(0, 1)] private float presentProbability = 0.10f;
+    [SerializeField, Range(0, 1)] private float bombProbability = 0.05f;
 
     [Header("Spawn Settings")]
     [SerializeField] private GameObject spawnCenter;
@@ -123,6 +124,7 @@ public class BoxSpawner : MonoBehaviour
         return new Vector3(Random.Range(-spawnRadius, spawnRadius), Random.Range(-spawnRadius, spawnRadius), Random.Range(-spawnRadius, spawnRadius));
     }
 
+    #region Delivery Type
     public BoxObject.DeliveryType GetRandomDeliveryType()
     {
 
@@ -149,22 +151,25 @@ public class BoxSpawner : MonoBehaviour
             return BoxObject.DeliveryType.SameDay;
         }
     }
+    #endregion
 
+    #region Box Type
     private GameObject GetRandomBoxType()
     {
-        float value = Random.Range(0, 100);
+        float value = Random.Range(0, 1);
 
         // Interval = [ 0, box probability]
-        if (value < boxProbability) 
+        if (value <= boxProbability) 
         {
             return boxPrefabs[Random.Range(0, boxPrefabs.Length)];
         }
         // Interval = ] box probability, present probability ]
-        else if (value < (boxProbability + presentProbability)) 
+        else if (value <= (boxProbability + presentProbability)) 
         {
             return presentPrefabs[Random.Range(0, presentPrefabs.Length)];
         }
         // Interval = ] present robability, 100 ]
         return bombBoxPrefab; 
     }
+    #endregion
 }
