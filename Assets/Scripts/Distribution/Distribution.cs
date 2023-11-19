@@ -28,7 +28,13 @@ public static class Distribution
     }
     #endregion
 
-    // #region Poisson Distribution
+    // Generate a random number from a Uniform distribution
+    #region Uniform Distribution
+    public static float Uniform(int min, int max)
+    {
+        return Random.Range(min, max);
+    }
 
+    #endregion
 
 }

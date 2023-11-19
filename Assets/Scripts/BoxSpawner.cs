@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Runtime.CompilerServices;
 using UnityEditor;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -13,9 +15,9 @@ public class BoxSpawner : MonoBehaviour
     [SerializeField] private GameObject bombBoxPrefab;
 
     [Header("Box Type Probability")]
-    [SerializeField, Range(0, 1)] private float boxProbability = 0.85f;
-    [SerializeField, Range(0, 1)] private float presentProbability = 0.10f;
-    [SerializeField, Range(0, 1)] private float bombProbability = 0.05f;
+    [SerializeField, Range(0, 1)] private float boxProbability = 0.92f;
+    [SerializeField, Range(0, 1)] private float presentProbability = 0.06f;
+    [SerializeField, Range(0, 1)] private float bombProbability = 0.02f;
 
     [Header("Spawn Settings")]
     [SerializeField] private GameObject spawnCenter;
@@ -23,15 +25,15 @@ public class BoxSpawner : MonoBehaviour
     [SerializeField] private float spawnRate = 5f; // per second
 
     [Header("Exponential Distribution Settings")]
-    [SerializeField] private float lambdaWeight = 0.5f;
+    [SerializeField] private float lambdaWeight = 1.0f;
 
     [Header("Box Limiters")]
     [SerializeField, Range(1, 3)] private float minWidth = 1f;
     [SerializeField, Range(1, 3)] private float minHeight = 1f;
     [SerializeField, Range(1, 3)] private float minLength = 1f;
     [SerializeField, Range(3, 5)] private float maxWidth = 5f;
-    [SerializeField, Range(3, 5)] private float maxHeight = 5f;
-    [SerializeField, Range(3, 5)] private float maxLength = 5f;
+    [SerializeField, Range(3, 5)] private float maxHeight = 3f;
+    [SerializeField, Range(3, 5)] private float maxLength = 7f;
 
     [SerializeField, Range(0, 1)] private float minRotation = 0.5f;
     [SerializeField, Range(0, 1)] private float maxRotation = 0.5f;
@@ -88,21 +90,26 @@ public class BoxSpawner : MonoBehaviour
             rb.AddTorque(GetRandomRotation(), ForceMode.Impulse);
 
             // Apply random Weight
-            rb.mass = Mathf.Clamp(Distribution.Exponential(lambdaWeight), minWeight, maxWeight);
+            rb.mass = GetRandomWeight();
         }
     }
 
+    #region Spawn Rate
     public void SetSpawnRate(float newSpawnRate)
     {
         spawnRate = newSpawnRate;
     }
+    #endregion
 
+    #region Random Rotation
     public Vector3 GetRandomRotation()
     {
         // Random rotation vector
         return new Vector3(Random.Range(-minRotation, maxRotation), Random.Range(-minRotation, maxRotation), Random.Range(-minRotation, maxRotation));
     }
+    #endregion
 
+    #region Random Scale
     // Random scale (W, H, L)
     public Vector3 GetRandomScale()
     {
@@ -117,22 +124,33 @@ public class BoxSpawner : MonoBehaviour
 
         return new Vector3(randomWidth, randomHeight, randomLength);
     }
+    #endregion
 
+    #region Random Weight
+    public float GetRandomWeight()
+    {
+        return Mathf.Clamp(Distribution.Exponential(lambdaWeight), minWeight, maxWeight);
+    }
+
+    #endregion
+
+    #region Spawn Location
     public Vector3 GetRandomLocation()
     {
         // Random spawn location
         return new Vector3(Random.Range(-spawnRadius, spawnRadius), Random.Range(-spawnRadius, spawnRadius), Random.Range(-spawnRadius, spawnRadius));
     }
+    #endregion
 
     #region Delivery Type
     public BoxObject.DeliveryType GetRandomDeliveryType()
     {
+        float value = GetRandomDeliveryTypeValue(); // lambda
 
-        float value = Distribution.Exponential(0.1f);
-
-        float standardThreshold = 0.7f; // 70% chance
-        float twoDayThreshold = 0.9f; // 20% chance
-        float overnightThreshold = 0.97f; // 7% chance
+        // Updated thresholds based on calculations
+        float standardThreshold = 1.20f;
+        float twoDayThreshold = 2.30f;
+        float overnightThreshold = 3.51f;
 
         if (value < standardThreshold)
         {
@@ -151,12 +169,18 @@ public class BoxSpawner : MonoBehaviour
             return BoxObject.DeliveryType.SameDay;
         }
     }
+
+    public float GetRandomDeliveryTypeValue()
+    {
+        return Distribution.Exponential(1.0f);
+    }
+
     #endregion
 
     #region Box Type
-    private GameObject GetRandomBoxType()
+    public GameObject GetRandomBoxType()
     {
-        float value = Random.Range(0, 1);
+        float value = Distribution.Uniform(0, 1);
 
         // Interval = [ 0, box probability]
         if (value <= boxProbability) 
@@ -169,7 +193,13 @@ public class BoxSpawner : MonoBehaviour
             return presentPrefabs[Random.Range(0, presentPrefabs.Length)];
         }
         // Interval = ] present robability, 100 ]
-        return bombBoxPrefab; 
+        return bombBoxPrefab;
     }
+
+    public float GetRandomBoxTypeValue()
+    {
+        return Distribution.Uniform(0, 1);
+    }
+
     #endregion
 }
