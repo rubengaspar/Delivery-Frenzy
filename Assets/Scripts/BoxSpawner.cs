@@ -22,10 +22,15 @@ public class BoxSpawner : MonoBehaviour
     [Header("Spawn Settings")]
     [SerializeField] private GameObject spawnCenter;
     [SerializeField] private float spawnRadius = 1f;
-    [SerializeField] private float spawnRate = 5f; // per second
+    [SerializeField] private float spawnLambdaWeight = 2f;
+    [SerializeField] private float maxLambdaWeight = 10f; // Max spawn rate corresponds to lambdaWeight of 10
+    [SerializeField] private float lambdaDecreaseRate = 0.1333f; 
+
+    // [SerializeField] private float spawnRate = 5f; // per second
 
     [Header("Exponential Distribution Settings")]
     [SerializeField] private float lambdaWeight = 1.0f;
+    
 
     [Header("Box Limiters")]
     [SerializeField, Range(1, 3)] private float minWidth = 1f;
@@ -42,20 +47,36 @@ public class BoxSpawner : MonoBehaviour
     [SerializeField, Range(2, 5)] private float maxWeight = 5f;
 
     private float nextSpawnTime;
+    private float elapsedTime;
     private GameManager gameManager;
-
+    
     public void Initialize(GameManager gameManager)
     {
         this.gameManager = gameManager;
     }
 
+    private void Start()
+    {
+        nextSpawnTime = Time.time;
+    }
+
     public void CustomUpdate()
     {
+        //if (Time.time >= nextSpawnTime)
+        //{
+        //    SpawnBox();
+        //    nextSpawnTime = Time.time + 1f / spawnRate;
+        //}
+
         if (Time.time >= nextSpawnTime)
         {
             SpawnBox();
-            nextSpawnTime = Time.time + 1f / spawnRate;
+
+            // Set the next spawn time
+            nextSpawnTime = Time.time + GetRandomSpawnDelay();
         }
+
+
     }
 
     void SpawnBox()
@@ -94,13 +115,7 @@ public class BoxSpawner : MonoBehaviour
         }
     }
 
-    #region Spawn Rate
-    public void SetSpawnRate(float newSpawnRate)
-    {
-        spawnRate = newSpawnRate;
-    }
-    #endregion
-
+    // Random Rotation
     #region Random Rotation
     public Vector3 GetRandomRotation()
     {
@@ -109,6 +124,16 @@ public class BoxSpawner : MonoBehaviour
     }
     #endregion
 
+    // Random Location
+    #region Spawn Location
+    public Vector3 GetRandomLocation()
+    {
+        // Random spawn location
+        return new Vector3(Random.Range(-spawnRadius, spawnRadius), Random.Range(-spawnRadius, spawnRadius), Random.Range(-spawnRadius, spawnRadius));
+    }
+    #endregion
+
+    // Random Scale
     #region Random Scale
     // Random scale (W, H, L)
     public Vector3 GetRandomScale()
@@ -126,6 +151,7 @@ public class BoxSpawner : MonoBehaviour
     }
     #endregion
 
+    // Random Weight
     #region Random Weight
     public float GetRandomWeight()
     {
@@ -134,15 +160,32 @@ public class BoxSpawner : MonoBehaviour
 
     #endregion
 
-    #region Spawn Location
-    public Vector3 GetRandomLocation()
+    // Random Spawn Delay
+    #region Random Spawn Delay
+    //public void SetSpawnRate(float newSpawnRate)
+    //{
+    //    spawnRate = newSpawnRate;
+    //}
+
+    public float GetRandomSpawnDelay()
     {
-        // Random spawn location
-        return new Vector3(Random.Range(-spawnRadius, spawnRadius), Random.Range(-spawnRadius, spawnRadius), Random.Range(-spawnRadius, spawnRadius));
+        // Update elapsedTime
+        elapsedTime += Time.deltaTime;
+
+        // Adjust lambdaWeight over time, not allowing it to exceed maxLambdaWeight
+        spawnLambdaWeight = Mathf.Min(maxLambdaWeight, spawnLambdaWeight + lambdaDecreaseRate * elapsedTime);
+
+        // result of the distribution
+        return Distribution.Exponential(spawnLambdaWeight);
     }
+
+
+
+
     #endregion
 
-    #region Delivery Type
+    // Random Delivery Type
+    #region Random Delivery Type
     public BoxObject.DeliveryType GetRandomDeliveryType()
     {
         float value = GetRandomDeliveryTypeValue(); // lambda
@@ -177,10 +220,11 @@ public class BoxSpawner : MonoBehaviour
 
     #endregion
 
-    #region Box Type
+    // Random Box Type
+    #region Random Box Type
     public GameObject GetRandomBoxType()
     {
-        float value = Distribution.Uniform(0, 1);
+        float value = Distribution.Uniform(0f, 1f);
 
         // Interval = [ 0, box probability]
         if (value <= boxProbability) 
@@ -198,7 +242,7 @@ public class BoxSpawner : MonoBehaviour
 
     public float GetRandomBoxTypeValue()
     {
-        return Distribution.Uniform(0, 1);
+        return Distribution.Uniform(0f, 1f);
     }
 
     #endregion

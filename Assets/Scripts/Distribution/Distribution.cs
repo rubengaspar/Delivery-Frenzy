@@ -30,7 +30,7 @@ public static class Distribution
 
     // Generate a random number from a Uniform distribution
     #region Uniform Distribution
-    public static float Uniform(int min, int max)
+    public static float Uniform(float min, float max)
     {
         return Random.Range(min, max);
     }
