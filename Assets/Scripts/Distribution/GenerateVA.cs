@@ -83,6 +83,39 @@ public static class GenerateVA
     }
     #endregion
 
+    // Spawn Delay
+    #region Generate Spawn Delay Data
+    public static void GenerateSpawnDelayData(int sampleSize, int samples)
+    {
+        BoxSpawner boxSpawner = new BoxSpawner();
+
+        // File path
+        string folderPath = Application.dataPath + "/VA_Outputs";
+        string filePath = folderPath + "/spawnDelayData"; ;
+
+        // Check if the VA_Outputs directory exists
+        if (!Directory.Exists(folderPath))
+        {
+            // If it doesn't exist, create it
+            Directory.CreateDirectory(folderPath);
+        }
+
+        for (int s = 0; s < samples; s++)
+        {
+            List<float> spawnDelayData = new List<float>();
+
+            for (int i = 0; i < sampleSize; i++)
+            {
+                spawnDelayData.Add(boxSpawner.GetRandomSpawnDelay());
+            }
+
+            string newFilePath = filePath + s + ".csv";
+            GenerateVA.WriteToCSV(spawnDelayData, newFilePath);
+        }
+    }
+    #endregion
+
+    // Delivery Type
     #region Generate Delivery Type Data
     public static void GenerateDeliveryTypeData(int sampleSize, int samples)
     {
@@ -115,6 +148,7 @@ public static class GenerateVA
     }
     #endregion
 
+    // Box Type
     #region Generate Box Type Data
     public static void GenerateBoxTypeData(int sampleSize, int samples)
     {

@@ -24,7 +24,7 @@ public class TimeManager : MonoBehaviour
     public void Initialize(GameManager gameManager)
     {
         this.gameManager = gameManager;
-        boxSpawnManager.GetComponent<BoxSpawner>().SetSpawnRate(initialSpawnRate);
+        // boxSpawnManager.GetComponent<BoxSpawner>().SetSpawnRate(initialSpawnRate);
         StartCoroutine(YearRotation());
     }
 
@@ -48,7 +48,7 @@ public class TimeManager : MonoBehaviour
                 dayProgression = 0;
                 currentDay = (currentDay + 1) % daysPerYear;
 
-                UpdateSpawnRate();
+                // UpdateSpawnRate();
 
                 newDayStarted = true;
             }
@@ -81,11 +81,11 @@ public class TimeManager : MonoBehaviour
         return currentDay / daysPerYear + 1;
     }
 
-    private void UpdateSpawnRate()
-    {
-        float newSpawnRate = initialSpawnRate + dayProgression;
-        boxSpawnManager.GetComponent<BoxSpawner>().SetSpawnRate(newSpawnRate);
-    }
+    //private void UpdateSpawnRate()
+    //{
+    //    float newSpawnRate = initialSpawnRate + dayProgression;
+    //    boxSpawnManager.GetComponent<BoxSpawner>().SetSpawnRate(newSpawnRate);
+    //}
 
     private void UpdateTimeUI()
     {
