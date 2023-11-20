@@ -1,0 +1,47 @@
+# User-specific files
+.git/
+
+# Visual Studio cache directory
+.vs/
+.vscode/
+.vsconfig
+
+# Rider cache directory
+.idea/
+
+# Unity3D generated meta files
+*.pidb.meta
+*.pdb.meta
+
+# Unity3D Generated File On Crash Reports
+sysinfo.txt
+
+# Unity generated files and directories
+/Build/
+/Builds/
+/Library/
+/Logs/
+/MemoryCaptures/
+/Obj/
+/Temp/
+/UserSettings/
+
+# Windows thumbnail cache files
+Thumbs.db
+ehthumbs.db
+
+# Folder config file
+Desktop.ini
+
+# Others
+.collabignore
+
+# Visual Studio cache files
+*.csproj
+*.sln
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
