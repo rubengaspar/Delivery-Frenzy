@@ -35,6 +35,11 @@ public static class Distribution
         return Random.Range(min, max);
     }
 
+    public static int Uniform(int min, int max)
+    {
+        return Random.Range(min, max);
+    }
+
     #endregion
 
 }

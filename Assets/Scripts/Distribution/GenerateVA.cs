@@ -84,7 +84,7 @@ public static class GenerateVA
     #endregion
 
     // Spawn Delay
-    #region Generate Spawn Delay Data
+    #region Generate Spawn Delay Data - Using the Delay Implementation with Exponential Distribution
     public static void GenerateSpawnDelayData(int sampleSize, int samples)
     {
         BoxSpawner boxSpawner = new BoxSpawner();
@@ -114,6 +114,38 @@ public static class GenerateVA
         }
     }
     #endregion
+
+    #region Generate Spawn Rate - Uniform Distribution
+    public static void GenerateSpawnRateData(int sampleSize, int samples)
+    {
+        BoxSpawner boxSpawner = new BoxSpawner();
+
+        // File path
+        string folderPath = Application.dataPath + "/VA_Outputs";
+        string filePath = folderPath + "/spawnRateData"; ;
+
+        // Check if the VA_Outputs directory exists
+        if (!Directory.Exists(folderPath))
+        {
+            // If it doesn't exist, create it
+            Directory.CreateDirectory(folderPath);
+        }
+
+        for (int s = 0; s < samples; s++)
+        {
+            List<int> spawnRateData = new List<int>();
+
+            for (int i = 0; i < sampleSize; i++)
+            {
+                spawnRateData.Add(boxSpawner.GetRandomSpawnRate());
+            }
+
+            string newFilePath = filePath + s + ".csv";
+            GenerateVA.WriteToCSV(spawnRateData, newFilePath);
+        }
+    }
+    #endregion
+
 
     // Delivery Type
     #region Generate Delivery Type Data

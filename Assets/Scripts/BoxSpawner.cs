@@ -22,17 +22,20 @@ public class BoxSpawner : MonoBehaviour
     [Header("Spawn Settings")]
     [SerializeField] private GameObject spawnCenter;
     [SerializeField] private float spawnRadius = 1f;
-    [SerializeField] private float spawnLambdaWeight = 2f;
+    [SerializeField] private float spawnRate = 5f; // per second
+    [SerializeField] private float spawnLambdaWeight = 2f; // for exponential implementation of spawn
     [SerializeField] private float maxLambdaWeight = 10f; // Max spawn rate corresponds to lambdaWeight of 10
     [SerializeField] private float lambdaDecreaseRate = 0.1333f; 
 
-    // [SerializeField] private float spawnRate = 5f; // per second
 
     [Header("Exponential Distribution Settings")]
     [SerializeField] private float lambdaWeight = 1.0f;
-    
+
 
     [Header("Box Limiters")]
+    [SerializeField, Range(0, 50)] private int minRate = 5;
+    [SerializeField, Range(0, 50)] private int maxRate = 16;
+
     [SerializeField, Range(1, 3)] private float minWidth = 1f;
     [SerializeField, Range(1, 3)] private float minHeight = 1f;
     [SerializeField, Range(1, 3)] private float minLength = 1f;
@@ -62,21 +65,19 @@ public class BoxSpawner : MonoBehaviour
 
     public void CustomUpdate()
     {
-        //if (Time.time >= nextSpawnTime)
-        //{
-        //    SpawnBox();
-        //    nextSpawnTime = Time.time + 1f / spawnRate;
-        //}
-
         if (Time.time >= nextSpawnTime)
         {
             SpawnBox();
-
-            // Set the next spawn time
-            nextSpawnTime = Time.time + GetRandomSpawnDelay();
+            float delay = 1 / spawnRate;
+            nextSpawnTime = Time.time + delay;
         }
 
-
+        //if (Time.time >= nextSpawnTime)
+        //{
+        //    SpawnBox();
+        //    // Set the next spawn time
+        //    nextSpawnTime = Time.time + GetRandomSpawnDelay();
+        //}
     }
 
     void SpawnBox()
@@ -177,6 +178,11 @@ public class BoxSpawner : MonoBehaviour
 
         // result of the distribution
         return Distribution.Exponential(spawnLambdaWeight);
+    }
+
+    public int GetRandomSpawnRate()
+    {
+        return Distribution.Uniform(minRate, maxRate);
     }
 
 

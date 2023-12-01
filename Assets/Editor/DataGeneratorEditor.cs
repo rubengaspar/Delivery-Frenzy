@@ -25,12 +25,21 @@ public class DataGeneratorEditor : Editor
     }
     #endregion
 
-    // Spawn Delay
+    // Spawn Delay & Spawn Rate
     #region Data Generation / Generate Spawn Delay Data
     [MenuItem("Data Generation/Generate Spawn Delay Data")]
-    private static void GenerateSpawnRateData()
+    private static void GenerateSpawnDelayData()
     {
         GenerateVA.GenerateSpawnDelayData(100000, 5);
+        Debug.Log("Spawn Delay data generation complete.");
+    }
+    #endregion
+
+    #region Data Generation / Generate Spawn Rate Data
+    [MenuItem("Data Generation/Generate Spawn Rate Data")]
+    private static void GenerateSpawnRateData()
+    {
+        GenerateVA.GenerateSpawnRateData(100000, 5);
         Debug.Log("Spawn Rate data generation complete.");
     }
     #endregion
