@@ -5,6 +5,9 @@ using UnityEngine;
 
 public class TimeManager : MonoBehaviour
 {
+
+    public static TimeManager Instance { get; private set; }
+
     [Header("UI Settings")]
     [SerializeField] private TMP_Text timeText;
 
@@ -15,11 +18,30 @@ public class TimeManager : MonoBehaviour
     [SerializeField] private GameObject boxSpawnManager;
     [SerializeField] private float initialSpawnRate = 5f;
 
+
+    public float minutesInADay = 1440f;
+
     private int daysPerYear = 360;
     private float dayProgression;
     private int currentDay = 0;
     private bool newDayStarted = false;
     private GameManager gameManager;
+
+    
+
+    void Awake()
+    {
+        // If there is an instance, and it's not me, destroy myself.
+        if (Instance != null && Instance != this)
+        {
+            Destroy(this.gameObject);
+        }
+        else
+        {
+            Instance = this;
+            DontDestroyOnLoad(this.gameObject); // Optional: Makes the instance persist across scenes
+        }
+    }
 
     public void Initialize(GameManager gameManager)
     {
@@ -79,6 +101,11 @@ public class TimeManager : MonoBehaviour
     public int GetCurrentYear()
     {
         return currentDay / daysPerYear + 1;
+    }
+
+    public float GetCurrentGameTimeInMinutes()
+    {
+        return currentDay * realMinutesPerDay + dayProgression * realMinutesPerDay;
     }
 
     //private void UpdateSpawnRate()

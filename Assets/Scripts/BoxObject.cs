@@ -1,17 +1,14 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
+using System;
 using UnityEngine;
 
 public class BoxObject : MonoBehaviour
 {
-    public enum DeliveryStatus
+    public enum ColorType
     {
-        NotDelivered,
-        Delivered,
-        Destroyed,
-        Lost,
-        Stolen
+        Green,
+        Purple,
+        Yellow,
+        Bomb
     }
     
     public enum DeliveryType
@@ -19,105 +16,118 @@ public class BoxObject : MonoBehaviour
         Standard,
         TwoDay,
         Overnight,
-        SameDay
+        SameDay,
     }
 
     [Header("Settings")]
     [SerializeField] public Color color;
+    [SerializeField] public ColorType colorType;
     [SerializeField] private int currentPoints = 50; // starting points
     [SerializeField] private int timeBonusMultiplier = 5;
-    [SerializeField] public float maxDeliveryTime;
-    [SerializeField] public int destroyedPointDeduction = 50;
-    [SerializeField] public int lostPointDeduction = 20;
-    [SerializeField] public int stolenPointDeduction = 10;
+    [SerializeField] public DeliveryType deliveryType;
 
     [Header("Variable Observation")]
-    [SerializeField] public DeliveryStatus deliveryStatus = DeliveryStatus.NotDelivered;
     [SerializeField] private float spawnTime;
-    [SerializeField] private float timeToDeliver;
-    [SerializeField] public DeliveryType deliveryType; 
-    [SerializeField, Range(0, 1)] private float waterDamage = 0;
-    [SerializeField, Range(0, 1)] private float fireDamage = 0;
-    
+    [SerializeField] public float deliveryDeadline = 0;
+    [SerializeField] private float deliveryMinutesRemaining;
+
+
+    private TimeManager timeManager;
+
     void Start()
     {
-        // Record the spawn time
-        spawnTime = Time.time;
+        timeManager = TimeManager.Instance;
+
+        if (timeManager != null)
+        {
+            spawnTime = timeManager.GetCurrentGameTimeInMinutes();
+        }
     }
 
     public float GetCurrentPoints()
     {
+        
+
+        float maxDimBonus = 15f; // max width + max height + max length
+        float maxTimeBonus = deliveryDeadline - spawnTime;
+        float maxWeightBonus = 10f; // max weight
+
         Rigidbody rb = GetComponent<Rigidbody>();
+        
         if (rb == null)
         {
             return 0;
         }
 
         float weight = rb.mass;
-        float size = rb.transform.localScale.x * rb.transform.localScale.y * rb.transform.localScale.z;
-        float timeBonus = 0;
-        float damageFactor = 1 - Mathf.Clamp((waterDamage + fireDamage), 0, 1);
+        float dimBonus = rb.transform.localScale.x + rb.transform.localScale.y + rb.transform.localScale.z;
+        float timeBonus = CalculateTimeBonus();
 
-        switch (deliveryStatus)
-        {
-            case DeliveryStatus.Delivered:
-                timeBonus = (maxDeliveryTime - timeToDeliver) * timeBonusMultiplier;
-                currentPoints = Mathf.RoundToInt((weight + size + timeBonus) * damageFactor);
-                break;
+        // Normalizing each component
+        float normalizedWeightBonus = Mathf.Min(10, (weight / maxWeightBonus) * 10);
+        float normalizedDimBonus = Mathf.Min(10, (dimBonus / maxDimBonus * 10));
+        float normalizedTimeBonus = Mathf.Min(10, (timeBonus / maxTimeBonus) * 10);
 
-            case DeliveryStatus.NotDelivered:
-                timeBonus = (maxDeliveryTime - Time.time) * timeBonusMultiplier;
-                currentPoints = Mathf.RoundToInt((weight + size + timeBonus) * damageFactor);
-                break;
-
-            case DeliveryStatus.Destroyed:
-                currentPoints = destroyedPointDeduction;
-                break;
-
-            case DeliveryStatus.Lost:
-                currentPoints = lostPointDeduction;
-                break;
-
-            case DeliveryStatus.Stolen:
-                currentPoints = stolenPointDeduction;
-                break;
-
-            default:
-                break;
-        }
+        currentPoints = Mathf.RoundToInt(normalizedWeightBonus + normalizedDimBonus + normalizedTimeBonus);
 
         return currentPoints;
-
     }
 
-    public void Burn(float amount)
+
+    private float CalculateTimeBonus()
+    {       
+
+        deliveryMinutesRemaining = GetRemainingDeliveryTime();
+        
+        float bonus = 0;
+
+        bonus = deliveryMinutesRemaining > 0 ? deliveryMinutesRemaining : 0;
+
+        return bonus;
+    }
+
+    public float GetRemainingDeliveryTime()
     {
-        Mathf.Clamp(fireDamage += amount, 0, 1);
+        timeManager = TimeManager.Instance;
+
+        if (timeManager == null)
+        {
+            return 0;
+        }
+
+        deliveryMinutesRemaining = deliveryDeadline - (timeManager.GetCurrentGameTimeInMinutes() - spawnTime);
+
+        return deliveryMinutesRemaining > 0 ? deliveryMinutesRemaining : 0;
     }
 
-    public void WaterDamage(float amount)
+
+    public float SetDeliveryDeadline() 
     {
-        Mathf.Clamp(waterDamage += amount, 0, 1);
+
+        timeManager = TimeManager.Instance;
+
+        switch(this.deliveryType)
+        {
+            case (DeliveryType.Standard):
+                deliveryDeadline = timeManager.minutesInADay * 7f;
+                return deliveryDeadline;
+            case (DeliveryType.TwoDay):
+                deliveryDeadline = timeManager.minutesInADay * 2f;
+                return deliveryDeadline;
+            case (DeliveryType.Overnight):
+                deliveryDeadline = timeManager.minutesInADay * 1f;
+                return deliveryDeadline;
+            case (DeliveryType.SameDay):
+                deliveryDeadline = timeManager.minutesInADay * 0.5f;
+                return deliveryDeadline;
+        }
+
+        return deliveryDeadline;
+
+    }
+    public void SetColorType(BoxObject.ColorType colorType)
+    {
+        this.colorType = colorType;
     }
 
-    public void Deliver()
-    {
-        timeToDeliver = Time.time;
-        deliveryStatus = DeliveryStatus.Delivered;
-    }
-
-    public void Destroy()
-    {
-       deliveryStatus = DeliveryStatus.Destroyed;
-    }
-
-    public void Steal()
-    {
-        deliveryStatus = DeliveryStatus.Stolen;
-    }
-
-    public void Loose()
-    {
-        deliveryStatus = DeliveryStatus.Lost;
-    }
 }

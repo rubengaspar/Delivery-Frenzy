@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
@@ -10,6 +9,8 @@ public class PlayerController : MonoBehaviour
     #region Monitoring Variables
     [Header("Monitoring")]
     [SerializeField] private Coroutine currentDashCoroutine;
+    [SerializeField] private TMP_Text scoreText;
+    [SerializeField] private float playerScore = 0;
     #endregion
 
     // Movement Settings
@@ -56,7 +57,7 @@ public class PlayerController : MonoBehaviour
     [Header("Dash Settings")]
     [SerializeField] private float dashSpeed = 50f;
     [SerializeField] private float dashDuration = 0.5f;
-    [SerializeField] private float dashCooldown = 1f;
+    [SerializeField] private float dashCooldown = 0.5f;
     [SerializeField] private bool isDashing = false;
     private float lastDashTime;
     #endregion
@@ -128,6 +129,12 @@ public class PlayerController : MonoBehaviour
     private void FixedUpdate()
     {
         MovePlayer();
+
+        if (!IsGrounded())
+        {
+            rb.AddForce(Vector3.down * 20f, ForceMode.Acceleration);
+        }
+
     }
 
     #endregion
@@ -229,13 +236,34 @@ public class PlayerController : MonoBehaviour
     {
         if (isHoldingBox)
         {
+
+            // Weights
             float weight = heldBox.GetComponent<Rigidbody>().mass;
+
+            // Dimensions
             float width = heldBox.transform.localScale.x;
             float height = heldBox.transform.localScale.y;
             float length = heldBox.transform.localScale.z;
 
+            // Delivery Type
+            float deliveryTimeRemaining = heldBox.GetComponent<BoxObject>().GetRemainingDeliveryTime();
+            float deliveryPoints = heldBox.GetComponent<BoxObject>().GetCurrentPoints();
+
+            int deliveryDaysRemaining = (int) deliveryTimeRemaining / 1440;
+            int deliveryHoursRemaining = (int) ((deliveryTimeRemaining - (deliveryDaysRemaining * 1440)) / 60);
+            int deliveryMinutesRemaining = (int)(deliveryTimeRemaining -
+                                                        (deliveryDaysRemaining * 1440) -
+                                                        (deliveryHoursRemaining * 60));
+
             boxInfo.enabled = true;
-            boxInfo.text = $"Weight: {weight:F2}kg\nWidth: {width:F0}\nHeight: {height:F0}\nLength: {length:F0}";
+            
+            boxInfo.text = $"Weight: {weight:F2}kg\n" +
+                $"Width: {width:F2}\n" +
+                $"Height: {height:F2}\n" +
+                $"Length: {length:F2}\n\n" + 
+                $"Deadline: {deliveryDaysRemaining:F0}d {deliveryHoursRemaining:F0}h {deliveryMinutesRemaining:F0}min\n" +
+                $"Score: {deliveryPoints:F0}\n" +
+                $"Color: ";
         }
         else
         {
@@ -245,7 +273,10 @@ public class PlayerController : MonoBehaviour
 
     void HighlightObject(GameObject box)
     {
-        box.GetComponent<Renderer>().material.color = box.GetComponent<BoxObject>().color;
+        lastTarget = box;
+        Color color = box.GetComponent<BoxObject>().color;
+        box.GetComponent<Renderer>().material.color = Color.yellow;       
+
     }
 
     void UnhighlightLastTarget()
@@ -287,14 +318,19 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void DropAction()
+    public void DropAction()
     {
         isHoldingBox = false;
-        heldBox.transform.SetParent(BoxHolder.transform);
-        heldBox.GetComponent<Rigidbody>().isKinematic = false;
 
-        lastTarget = heldBox;
-        UnhighlightLastTarget();
+        if (heldBox != null )
+        {
+            heldBox.transform.SetParent(BoxHolder.transform);
+            heldBox.GetComponent<Rigidbody>().isKinematic = false;
+
+            lastTarget = heldBox;
+            UnhighlightLastTarget();
+        }
+
         heldBox = null;
     }
     #endregion
@@ -391,10 +427,6 @@ public class PlayerController : MonoBehaviour
 
             boxRb.AddForce(throwDirection * currentThrowStrength, ForceMode.VelocityChange);
 
-            heldBox = null;
-            isHoldingBox = false;
-            throwText.enabled = false;
-
             if (IsInvoking("ThrowTimer"))
             {
                 StopCoroutine(ThrowTimer());
@@ -407,6 +439,14 @@ public class PlayerController : MonoBehaviour
 
             throwText.color = Color.white;
             throwText.enabled = false;
+
+            heldBox = null;
+            tempHeldBox = null;
+            isHoldingBox = false;
+            throwText.enabled = false;
+            lastTarget = heldBox;
+            UnhighlightLastTarget();
+
         }
     }
 
@@ -458,4 +498,10 @@ public class PlayerController : MonoBehaviour
     }
     #endregion
 
+    // Add Points to Score
+    public void AddScore(float score)
+    {
+        playerScore += score;
+        scoreText.text = $"SCORE: {score:F0}";
+    }
 }

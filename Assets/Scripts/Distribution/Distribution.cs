@@ -26,6 +26,12 @@ public static class Distribution
         float uniform = Random.Range(0f, 1f);
         return -Mathf.Log(uniform) / rate;
     }
+
+    public static float Exponential(float rate, float min, float mean)
+    {
+        return min - mean * Mathf.Log(Uniform(0f, 1f));
+    }
+
     #endregion
 
     // Generate a random number from a Uniform distribution

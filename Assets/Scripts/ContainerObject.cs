@@ -5,10 +5,10 @@ using UnityEngine;
 public class ContainerObject : MonoBehaviour
 {
     [SerializeField] TMP_Text _pointsText;
-    private float totalPoints = 0;
-
-    // List to store the boxes that are currently on top of the container
-    private List<BoxObject> boxesOnContainer = new List<BoxObject>();
+    [SerializeField] GameObject player;
+    [SerializeField] BoxObject.ColorType colorType;
+    private int boxesDelivered = 0;
+    
 
     // Trigger detection
     private void OnTriggerEnter(Collider other)
@@ -16,44 +16,28 @@ public class ContainerObject : MonoBehaviour
         BoxObject box = other.GetComponent<BoxObject>();
         if (box != null)
         {
-            Debug.Log("Box Delivered with Status: " + box.deliveryStatus);
-
-            if (box.deliveryStatus == BoxObject.DeliveryStatus.NotDelivered)
+            if (box.colorType == this.colorType)
             {
-                box.deliveryStatus = BoxObject.DeliveryStatus.Delivered;
+                float boxScore = box.GetCurrentPoints();
+
+                PlayerController playerController = player.GetComponent<PlayerController>();
+                if (playerController != null)
+                {
+                    // Drop Box and Add Score
+                    playerController.DropAction();
+                    playerController.AddScore(boxScore);
+                }
             }
 
-            boxesOnContainer.Add(box);
-            UpdatePoints(box, true);
-        }
-    }
+            boxesDelivered++;
 
-    private void OnTriggerExit(Collider other)
-    {
-        BoxObject box = other.GetComponent<BoxObject>();
-        if (box != null)
-        {
-            boxesOnContainer.Remove(box);
-            UpdatePoints(box, false);
-            box.deliveryStatus = BoxObject.DeliveryStatus.Stolen;
-        }
-    }
+            if (_pointsText != null)
+            {
+                _pointsText.text = $"{boxesDelivered:F0}";
+            }
+                        
 
-    private void UpdatePoints(BoxObject box, bool boxEntered)
-    {
-        if (boxEntered)
-        {
-            totalPoints += box.GetCurrentPoints();
+            Destroy(other.gameObject);
         }
-        else
-        {
-            totalPoints -= box.GetCurrentPoints();
-        }
-
-        if (_pointsText != null)
-        {
-            _pointsText.text = $"{totalPoints:F1}";
-        }
-
     }
 }
