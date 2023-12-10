@@ -2314,7 +2314,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _pointsText: {fileID: 11887064}
   player: {fileID: 596412406}
-  colorType: 0
+  colorType: 1
 --- !u!1 &446960519
 GameObject:
   m_ObjectHideFlags: 0
@@ -7362,7 +7362,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _pointsText: {fileID: 1161250275}
   player: {fileID: 596412406}
-  colorType: 0
+  colorType: 2
 --- !u!1 &1248190585
 GameObject:
   m_ObjectHideFlags: 0
